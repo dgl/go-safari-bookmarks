@@ -6,7 +6,7 @@ import (
   "os/user"
   "time"
 
-  "github.com/DHowett/go-plist"
+  "howett.net/plist"
 )
 
 const BookmarksPlist = "Library/Safari/Bookmarks.plist"

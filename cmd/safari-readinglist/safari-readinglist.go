@@ -5,7 +5,7 @@ import (
   "log"
   "time"
 
-  bookmarks ".."
+  bookmarks "github.com/dgl/go-safari-bookmarks"
 )
 
 func main() {
