@@ -3,6 +3,7 @@ package bookmarks
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"os/user"
 	"time"
 
@@ -80,4 +81,11 @@ func Readfile(filename string) (*Bookmarks, error) {
 		return nil, err
 	}
 	return &bookmarks, nil
+}
+
+// RequestFullDiskAccess opens Settings to the Full Disk Access pane.
+// Generally you should present something to your user suggesting how they
+// should proceed before doing this.
+func RequestFullDiskAccess() error {
+	return exec.Command("open", "x-apple.systempreferences:com.apple.preference.security?Privacy_AllFiles").Run()
 }

@@ -2,19 +2,25 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 
 	bookmarks "github.com/dgl/go-safari-bookmarks"
 )
 
 func main() {
-	bookmarks, err := bookmarks.Read()
+	bookmark, err := bookmarks.Read()
 	if err != nil {
+		if errors.Is(err, os.ErrPermission) {
+			log.Print("Full disk access is required. Please enable Full Disk Access for your terminal application in Settings.")
+			bookmarks.RequestFullDiskAccess()
+		}
 		log.Fatal(err)
 	}
-	dump(bookmarks.Bookmark, 0)
+	dump(bookmark.Bookmark, 0)
 }
 
 func dump(b bookmarks.Bookmark, level int) {
