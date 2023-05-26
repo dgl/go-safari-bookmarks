@@ -1,12 +1,12 @@
 package bookmarks
 
 import (
-  "fmt"
-  "os"
-  "os/user"
-  "time"
+	"fmt"
+	"os"
+	"os/user"
+	"time"
 
-  "howett.net/plist"
+	"howett.net/plist"
 )
 
 const BookmarksPlist = "Library/Safari/Bookmarks.plist"
@@ -15,69 +15,69 @@ var defaultFile string
 
 // Bookmarks is the top level of the tree. It also is a `Bookmark`.
 type Bookmarks struct {
-  Bookmark
+	Bookmark
 }
 
 type Bookmark struct {
- Children []Bookmark
- WebBookmarkType string
- Title string
- URLString string
- // Mostly has 'title' in it...
- URIDictionary map[string]interface{}
- ReadingList *ReadingList
+	Children        []Bookmark
+	WebBookmarkType string
+	Title           string
+	URLString       string
+	// Mostly has 'title' in it...
+	URIDictionary map[string]interface{}
+	ReadingList   *ReadingList
 }
 
 type ReadingList struct {
-  DateAdded time.Time
-  DateLastViewed time.Time
-  PreviewText string
+	DateAdded      time.Time
+	DateLastViewed time.Time
+	PreviewText    string
 }
 
 func (b Bookmark) String() string {
-  title := b.Title
-  if len(title) == 0 && b.URIDictionary["title"] != nil {
-    title = b.URIDictionary["title"].(string)
-  }
-  return fmt.Sprintf("%v %v", title, b.URLString)
+	title := b.Title
+	if len(title) == 0 && b.URIDictionary["title"] != nil {
+		title = b.URIDictionary["title"].(string)
+	}
+	return fmt.Sprintf("%v %v", title, b.URLString)
 }
 
 // ReadingItems searches the tree for reading list items and returns them in a list.
 func (b Bookmark) ReadingItems() (result []Bookmark) {
-  for _, item := range b.Children {
-    result = append(result, item.ReadingItems()...)
-  }
+	for _, item := range b.Children {
+		result = append(result, item.ReadingItems()...)
+	}
 
-  if b.ReadingList != nil {
-    result = append(result, b)
-  }
-  return
+	if b.ReadingList != nil {
+		result = append(result, b)
+	}
+	return
 }
 
 func init() {
-  u, err := user.Current()
-  if err != nil {
-    panic(err)  // init, can't do much better...
-  }
-  defaultFile = u.HomeDir + "/" + BookmarksPlist
+	u, err := user.Current()
+	if err != nil {
+		panic(err) // init, can't do much better...
+	}
+	defaultFile = u.HomeDir + "/" + BookmarksPlist
 }
 
 // Read the default bookmarks plist
 func Read() (*Bookmarks, error) {
-  return Readfile(defaultFile)
+	return Readfile(defaultFile)
 }
 
 // Readfile reads the given bookmarks plist
 func Readfile(filename string) (*Bookmarks, error) {
-  file, err := os.Open(filename)
-  if err != nil {
-    return nil, err
-  }
-  d := plist.NewDecoder(file)
-  var bookmarks Bookmarks
-  err = d.Decode(&bookmarks)
-  if err != nil {
-    return nil, err
-  }
-  return &bookmarks, nil
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, err
+	}
+	d := plist.NewDecoder(file)
+	var bookmarks Bookmarks
+	err = d.Decode(&bookmarks)
+	if err != nil {
+		return nil, err
+	}
+	return &bookmarks, nil
 }
